@@ -6,14 +6,12 @@
 // On palera1n, the JB root is the fixed path /var/jb (symlink to /private/var/jb).
 // Confirmed on iPadOS 18.7.9 / palera1n 2.3 / iPad 7th gen (A10 Fusion, T8010).
 //
-// This shim provides jbroot() and jbrand() so bootstrapd (a purely userland daemon)
-// can be compiled against palera1n's fixed-path layout instead of roothide's kernel
-// UUID mechanism. jailbreakd (kernel-dependent) is excluded from this port entirely.
+// This shim provides jbroot() and jbrand() compatible with both C (.c) and
+// ObjC (.m) compilation units. Foundation is only imported in ObjC mode.
 
 #ifndef PALERA1N_ROOTHIDE_COMPAT_H
 #define PALERA1N_ROOTHIDE_COMPAT_H
 
-#import <Foundation/Foundation.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -23,16 +21,15 @@
 // The JB root on palera1n — confirmed by: cat /var/jb/etc/apt/sources.list.d/procursus.sources
 #define PALERA1N_JB_ROOT_PATH "/var/jb"
 
-// A fixed brand value used for IPC session authentication.
-// roothide generates a random UUID per boot; palera1n has a fixed root so we use
-// a fixed magic constant instead. Value is "palera1" in ASCII — consistent across
-// all processes sharing this build.
+// Fixed brand value for IPC session authentication.
+// roothide generates a random UUID per boot; palera1n uses a fixed root path
+// so we use a fixed constant. All processes share the same value.
 static inline uint64_t jbrand(void) {
-    return 0x70616C65726131ULL;
+    return 0x70616C65726131ULL; // "palera1" in ASCII
 }
 
 // C string overload: jbroot("/basebin/foo") → "/var/jb/basebin/foo"
-// Allocates with malloc — suitable for short-lived use (daemon startup paths).
+// Works in both C and ObjC translation units.
 __attribute__((overloadable))
 static inline const char* jbroot(const char* path) {
     if (!path || path[0] == '\0') {
@@ -52,7 +49,10 @@ static inline const char* jbroot(const char* path) {
     return result;
 }
 
-// NSString overload: jbroot(@"/basebin/foo") → @"/var/jb/basebin/foo"
+// NSString overload — only available in ObjC translation units (.m files)
+#ifdef __OBJC__
+#import <Foundation/Foundation.h>
+
 __attribute__((overloadable))
 static inline NSString* jbroot(NSString* path) {
     if (!path || path.length == 0) {
@@ -64,5 +64,6 @@ static inline NSString* jbroot(NSString* path) {
     }
     return [root stringByAppendingPathComponent:path];
 }
+#endif /* __OBJC__ */
 
 #endif /* PALERA1N_ROOTHIDE_COMPAT_H */
