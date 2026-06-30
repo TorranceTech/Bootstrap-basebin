@@ -1,6 +1,12 @@
-TARGET := iphone:clang:latest:15.0
-
+ifeq ($(PALERA1N),1)
+# palera1n: arm64 only (A10/A10X), rootless scheme works with standard Theos
+ARCHS = arm64
+THEOS_PACKAGE_SCHEME = rootless
+TARGET := iphone:clang:latest:16.0
+else
 THEOS_PACKAGE_SCHEME = roothide
+TARGET := iphone:clang:latest:15.0
+endif
 
 FINALPACKAGE ?= 1
 DEBUG ?= 0

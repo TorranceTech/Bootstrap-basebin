@@ -1,8 +1,14 @@
+ifeq ($(PALERA1N),1)
+# palera1n targets arm64 only (A10/A10X have no PAC); use rootless scheme
+# so standard Theos works — no need for roothide's Theos fork.
+ARCHS = arm64
+THEOS_PACKAGE_SCHEME = rootless
+else
 ARCHS = arm64 arm64e
-
-TARGET := iphone:clang:latest:15.0
-
 THEOS_PACKAGE_SCHEME = roothide
+endif
+
+TARGET := iphone:clang:latest:16.0
 
 # FINALPACKAGE ?= 1
 # DEBUG ?= 0
