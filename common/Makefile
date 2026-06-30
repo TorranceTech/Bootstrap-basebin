@@ -23,12 +23,14 @@ libcommon_CCFLAGS = -fvisibility=hidden -std=c++17
 libcommon_LFGLAGS = -L.
 
 ifeq ($(PALERA1N),1)
-# palera1n build: exclude jailbreakd XPC client files.
-# jailbreakd.c and jbclient.c include <xpc/xpc.h> which picks up the local
-# common/xpc/module.modulemap and shadows the SDK's XPC module — fatal error
-# on iOS 26 SDK. These files are dead code on palera1n (no jailbreakd daemon).
+# palera1n build: exclude jailbreakd XPC client files (dead code — no jailbreakd on palera1n).
+# Also use -fno-implicit-module-maps so the local common/xpc/module.modulemap is not
+# auto-discovered. Without this, ANY file importing Foundation triggers a fatal
+# "redefinition of module 'XPC'" because the local map shadows the SDK's XPC module.
+# With -fno-implicit-module-maps, #import <Foundation/Foundation.h> falls back to
+# classic header inclusion (no module cache) — slightly slower but correct.
 libcommon_FILES = $(filter-out jailbreakd.c jbclient.c, $(wildcard *.c *.m *.mm *.cpp))
-libcommon_CFLAGS += -DPALERA1N_BUILD -I../palera1n_compat
+libcommon_CFLAGS += -DPALERA1N_BUILD -I../palera1n_compat -fno-implicit-module-maps
 else
 libcommon_FILES = $(wildcard *.c *.m *.mm *.cpp)
 endif
