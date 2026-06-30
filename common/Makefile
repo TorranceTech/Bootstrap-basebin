@@ -30,7 +30,7 @@ ifeq ($(PALERA1N),1)
 # With -fno-implicit-module-maps, #import <Foundation/Foundation.h> falls back to
 # classic header inclusion (no module cache) — slightly slower but correct.
 libcommon_FILES = $(filter-out jailbreakd.c jbclient.c, $(wildcard *.c *.m *.mm *.cpp))
-libcommon_CFLAGS += -DPALERA1N_BUILD -I../palera1n_compat -fno-implicit-module-maps
+libcommon_CFLAGS += -DPALERA1N_BUILD -I../palera1n_compat -fno-implicit-module-maps -I../kexploit
 else
 libcommon_FILES = $(wildcard *.c *.m *.mm *.cpp)
 endif
