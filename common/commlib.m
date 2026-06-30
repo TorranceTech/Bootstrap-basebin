@@ -1186,6 +1186,9 @@ const char* roothide_get_sandbox_profile(pid_t pid, char buffer[255])
     return buffer;
 }
 
+// PALERA1N_BUILD: generate_sandbox_extensions is provided by
+// palera1n_compat/sandbox_ext_palera1n.m instead (fixed /var/jb path, no UUID).
+#ifndef PALERA1N_BUILD
 const char* generate_sandbox_extensions(bool ext)
 {
     NSMutableString *extensionString = [NSMutableString new];
@@ -1214,6 +1217,7 @@ const char* generate_sandbox_extensions(bool ext)
 
     return strdup(extensionString.UTF8String);
 }
+#endif /* PALERA1N_BUILD */
 
 int roothide_config_set_blacklist_enable(bool enabled)
 {

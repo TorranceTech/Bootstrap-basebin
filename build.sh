@@ -28,8 +28,10 @@ make clean && make
 cp ./dyldhook ../.build/
 cd -
 
+PALERA1N=${PALERA1N:-0}
+
 cd common
-make clean all
+make clean all PALERA1N=$PALERA1N
 cd -
 
 cd uicache
@@ -53,7 +55,7 @@ make clean all
 cd -
 
 cd bootstrapd
-make clean all
+make clean all PALERA1N=$PALERA1N
 cd -
 
 cd devtest

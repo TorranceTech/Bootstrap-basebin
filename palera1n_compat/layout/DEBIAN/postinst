@@ -1,0 +1,11 @@
+#!/bin/sh
+# palera1n bootstrapd postinst
+# palera1n uses fixed paths under /var/jb — no @JBROOT@/@JBRAND@ substitution needed.
+
+set -e
+
+PLIST=/var/jb/basebin/LaunchDaemons/com.palera1n.bootstrapd.plist
+
+# Reload the daemon
+launchctl unload "$PLIST" 2>/dev/null || true
+launchctl load "$PLIST"

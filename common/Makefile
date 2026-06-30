@@ -16,6 +16,11 @@ libcommon_FILES = $(wildcard *.c *.m *.mm *.cpp)
 libcommon_CFLAGS = -fvisibility=hidden -I. -DFISHHOOK_EXPORT -fobjc-arc -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations
 libcommon_CCFLAGS = -fvisibility=hidden -std=c++11
 libcommon_LFGLAGS = -L.
+
+ifeq ($(PALERA1N),1)
+# palera1n build: use fixed /var/jb root, exclude roothide runtime dependency
+libcommon_CFLAGS += -DPALERA1N_BUILD -I../palera1n_compat
+endif
 libcommon_LINKAGE_TYPE = static
 libcommon_INSTALL_PATH = /basebin
 

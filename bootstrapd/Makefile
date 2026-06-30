@@ -17,6 +17,12 @@ bootstrapd_LDFLAGS = -L../common/lib -lcommon -dead_strip -lbsm
 bootstrapd_CODESIGN_FLAGS = -Sentitlements.plist
 bootstrapd_INSTALL_PATH = /basebin/
 
+ifeq ($(PALERA1N),1)
+# palera1n build: shim in our fixed-path roothide.h; include sandbox_ext override
+bootstrapd_FILES += ../palera1n_compat/sandbox_ext_palera1n.m
+bootstrapd_CFLAGS += -DPALERA1N_BUILD -I../palera1n_compat
+endif
+
 include $(THEOS_MAKE_PATH)/tool.mk
 
 after-all::
