@@ -18,14 +18,19 @@ include $(THEOS)/makefiles/common.mk
 LIBRARY_NAME = libcommon
 $(LIBRARY_NAME)_INSTALL=0 # do not copy to theos/lib
 
-libcommon_FILES = $(wildcard *.c *.m *.mm *.cpp)
-libcommon_CFLAGS = -fvisibility=hidden -I. -DFISHHOOK_EXPORT -fobjc-arc -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -std=gnu17 -Wno-deprecated-non-prototype -DNDEBUG -fno-modules
+libcommon_CFLAGS = -fvisibility=hidden -I. -DFISHHOOK_EXPORT -fobjc-arc -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -std=gnu17 -Wno-deprecated-non-prototype -DNDEBUG
 libcommon_CCFLAGS = -fvisibility=hidden -std=c++17
 libcommon_LFGLAGS = -L.
 
 ifeq ($(PALERA1N),1)
-# palera1n build: use fixed /var/jb root, exclude roothide runtime dependency
+# palera1n build: exclude jailbreakd XPC client files.
+# jailbreakd.c and jbclient.c include <xpc/xpc.h> which picks up the local
+# common/xpc/module.modulemap and shadows the SDK's XPC module — fatal error
+# on iOS 26 SDK. These files are dead code on palera1n (no jailbreakd daemon).
+libcommon_FILES = $(filter-out jailbreakd.c jbclient.c, $(wildcard *.c *.m *.mm *.cpp))
 libcommon_CFLAGS += -DPALERA1N_BUILD -I../palera1n_compat
+else
+libcommon_FILES = $(wildcard *.c *.m *.mm *.cpp)
 endif
 libcommon_LINKAGE_TYPE = static
 libcommon_INSTALL_PATH = /basebin
