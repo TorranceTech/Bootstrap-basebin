@@ -18,15 +18,18 @@ TOOL_NAME = bootstrapd
 #-fvisibility=hidden 
 
 bootstrapd_FILES = $(wildcard *.c *.m *.mm *.cpp)
-bootstrapd_CFLAGS = -I../common -fobjc-arc -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
+bootstrapd_CFLAGS = -I../common -fobjc-arc -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration -Wno-misleading-indentation -DNDEBUG
 bootstrapd_LDFLAGS = -L../common/lib -lcommon -dead_strip -lbsm
 bootstrapd_CODESIGN_FLAGS = -Sentitlements.plist
 bootstrapd_INSTALL_PATH = /basebin/
 
 ifeq ($(PALERA1N),1)
-# palera1n build: shim in our fixed-path roothide.h; include sandbox_ext override
+# palera1n build: shim in our fixed-path roothide.h; include sandbox_ext override.
+# -fno-implicit-module-maps: prevents common/xpc/module.modulemap from shadowing
+# the SDK's XPC module (same fix as libcommon — any -I../common consumer needs this).
+# -I../kexploit: provides <choma/...> headers without a full ChOma-main build.
 bootstrapd_FILES += ../palera1n_compat/sandbox_ext_palera1n.m
-bootstrapd_CFLAGS += -DPALERA1N_BUILD -I../palera1n_compat
+bootstrapd_CFLAGS += -DPALERA1N_BUILD -I../palera1n_compat -fno-implicit-module-maps -I../kexploit
 endif
 
 include $(THEOS_MAKE_PATH)/tool.mk
